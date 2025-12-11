@@ -6,10 +6,10 @@
 sp1_zkvm::entrypoint!(main);
 
 use anyhow::Result;
-use serde_json::json;
 use sp1_zkvm::io::commit;
 use std::collections::{HashMap, HashSet};
 use zktls_att_verification::attestation_data::verify_attestation_data;
+use zktls_att_verification::attestation_data::AttestationConfig;
 
 mod errors;
 use errors::{ZkErrorCode, ZktlsError};
@@ -19,20 +19,16 @@ use structs::{AttestationMetaStruct, PublicValuesStruct};
 const RISK_URL: &str = "https://papi.binance.com/papi/v1/um/positionRisk";
 const BALANCE_URL: &str = "https://papi.binance.com/papi/v1/balance";
 const SPOT_BALANCE_URL: &str = "https://api.binance.com/api/v3/account";
+const UNIFIED_URL: &[&str] = &[RISK_URL, BALANCE_URL];
+const SPOT_URL: &[&str] = &[SPOT_BALANCE_URL];
 const STABLE_COINS: &[&str] = &[
     "USDT", "USDC", "FDUSD", "TUSD", "USDE", "XUSD", "USD1", "BFUSD", "USDP", "DAI",
-];
-const ATTESTORS: &[&str] = &[
-    "0xd638c623833aeb02c8049837bdd54e02540e7031",
-    "0x3d436d4c130e7e80df715f07b6ca5db927dd45f2",
-    "0x2f211ef8068ff70c8d851c145baca53ccec0aa07",
-    "0x6bfa68fab4d930f19c281f5f1f57a2e4ede5a848",
-    "0x96c3cac72a914eb0e6a1d74cdf2c8d6fa9d02320",
 ];
 
 fn app_unified(
     pv: &mut AttestationMetaStruct,
     attestation_data: &String,
+    attestation_config: &AttestationConfig,
     asset_bals: &mut HashMap<String, f64>,
 ) -> Result<(), ZktlsError> {
     //
@@ -57,10 +53,6 @@ fn app_unified(
         .and_then(|item| item.get("attestor"))
         .and_then(|a| a.as_str())
         .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    let attestion_confg = json!({
-        "attestor_addr": ATTESTORS,
-        "url": [RISK_URL, BALANCE_URL]
-    });
     pv.task_id = task_id.to_string();
     pv.report_tx_hash = report_tx_hash.to_string();
     pv.attestor = attestor_addr.to_string();
@@ -69,7 +61,10 @@ fn app_unified(
 
     //
     // 1. Verify
-    let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestion_confg.to_string())
+    let mut attestation_config = attestation_config.clone();
+    attestation_config.url = UNIFIED_URL.iter().map(|s| s.to_string()).collect();
+    let attestation_config = serde_json::to_string(&attestation_config).unwrap();
+    let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
         .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
 
     //
@@ -168,6 +163,7 @@ fn app_unified(
 fn app_spot(
     pv: &mut AttestationMetaStruct,
     attestation_data: &String,
+    attestation_config: &AttestationConfig,
     asset_bals: &mut HashMap<String, f64>,
 ) -> Result<(), ZktlsError> {
     //
@@ -192,10 +188,6 @@ fn app_spot(
         .and_then(|item| item.get("attestor"))
         .and_then(|a| a.as_str())
         .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    let attestion_confg = json!({
-        "attestor_addr": ATTESTORS,
-        "url": [SPOT_BALANCE_URL]
-    });
     pv.task_id = task_id.to_string();
     pv.report_tx_hash = report_tx_hash.to_string();
     pv.attestor = attestor_addr.to_string();
@@ -203,7 +195,10 @@ fn app_spot(
 
     //
     // 1. Verify
-    let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestion_confg.to_string())
+    let mut attestation_config = attestation_config.clone();
+    attestation_config.url = SPOT_URL.iter().map(|s| s.to_string()).collect();
+    let attestation_config = serde_json::to_string(&attestation_config).unwrap();
+    let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
         .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
 
     //
@@ -288,6 +283,9 @@ fn app_spot(
 }
 fn app_main(pv: &mut PublicValuesStruct) -> Result<(), ZktlsError> {
     let attestation_data: String = sp1_zkvm::io::read();
+    let config_data: String = sp1_zkvm::io::read();
+    let attestation_config: AttestationConfig =
+        serde_json::from_str(&config_data).map_err(|e| zkerr!(ZkErrorCode::ParseConfigData, e.to_string()))?;
 
     // Get Unified and Spot data
     let v: serde_json::Value = serde_json::from_str(&attestation_data)
@@ -306,11 +304,11 @@ fn app_main(pv: &mut PublicValuesStruct) -> Result<(), ZktlsError> {
     let mut asset_bals: HashMap<String, f64> = HashMap::new();
 
     let mut unified_am = AttestationMetaStruct::default();
-    app_unified(&mut unified_am, &unified_data, &mut asset_bals)?;
+    app_unified(&mut unified_am, &unified_data, &attestation_config, &mut asset_bals)?;
     pv.attestation_meta.push(unified_am);
 
     let mut spot_am = AttestationMetaStruct::default();
-    app_spot(&mut spot_am, &spot_data, &mut asset_bals)?;
+    app_spot(&mut spot_am, &spot_data, &attestation_config, &mut asset_bals)?;
     pv.attestation_meta.push(spot_am);
 
     // Summary assets by Category

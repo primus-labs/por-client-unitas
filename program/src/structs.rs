@@ -12,6 +12,9 @@ pub struct AttestationMetaStruct {
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
 pub struct PublicValuesStruct {
+    pub pv_type: String,
+    pub version: String,
+    pub project_id: String,
     pub attestation_meta: Vec<AttestationMetaStruct>,
     pub asset_balance: HashMap<String, f64>,
     pub status: i16,
