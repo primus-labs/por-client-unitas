@@ -17,7 +17,6 @@ pub enum ZkErrorCode {
     GetReportTxHashFail,
     GetSpotDataFail,
     GetUnifiedDataFail,
-    InvalidAttestor,
 }
 
 pub struct ZktlsError {

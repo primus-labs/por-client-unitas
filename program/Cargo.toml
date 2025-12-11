@@ -10,8 +10,5 @@ anyhow = { version = "1.0.40", default-features = false }
 thiserror = "2.0.17"
 serde = { version = "1.0.200", default-features = false, features = ["derive"] }
 
-# # zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", rev = "2c80f83" }
-# zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", branch = "network-por" }
-
-# zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", rev = "767ff78" }
-zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", branch = "network-succinct" }
+# zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", rev = "2c80f83" }
+zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", branch = "network-por" }

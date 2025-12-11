@@ -57,12 +57,8 @@ fn app_unified(
         .and_then(|item| item.get("attestor"))
         .and_then(|a| a.as_str())
         .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    ensure_zk!(
-        ATTESTORS.contains(&attestor_addr.to_ascii_lowercase().as_str()),
-        zkerr!(ZkErrorCode::InvalidAttestor)
-    );
     let attestion_confg = json!({
-        "attestor_addr": attestor_addr,
+        "attestor_addr": ATTESTORS,
         "url": [RISK_URL, BALANCE_URL]
     });
     pv.task_id = task_id.to_string();
@@ -79,7 +75,7 @@ fn app_unified(
     //
     // 2. Do some valid checks
     // In the vast majority of cases, it is legal. Data is extracted while the inspection is conducted.
-    let msg_len = messages[0].len();
+    let msg_len = messages.len();
     let requests = attestation_data.public_data[0].attestation.request.clone();
     let requests_len = requests.len();
     ensure_zk!(requests_len % 2 == 0, zkerr!(ZkErrorCode::InvalidRequestLength));
@@ -114,7 +110,7 @@ fn app_unified(
         if request.url.starts_with(RISK_URL) {
             ensure_zk!(i % 2 == 0, zkerr!(ZkErrorCode::InvalidRequestOrder));
 
-            let json_value = messages[0][i]
+            let json_value = messages[i]
                 .get_json_values(&um_paths)
                 .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
 
@@ -136,7 +132,7 @@ fn app_unified(
             let um_price = prices.join(",");
             um_prices.push(um_price);
         } else if request.url.starts_with(BALANCE_URL) {
-            let json_value = messages[0][i]
+            let json_value = messages[i]
                 .get_json_values(&bal_paths)
                 .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
 
@@ -196,12 +192,8 @@ fn app_spot(
         .and_then(|item| item.get("attestor"))
         .and_then(|a| a.as_str())
         .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    ensure_zk!(
-        ATTESTORS.contains(&attestor_addr.to_ascii_lowercase().as_str()),
-        zkerr!(ZkErrorCode::InvalidAttestor)
-    );
     let attestion_confg = json!({
-        "attestor_addr": attestor_addr,
+        "attestor_addr": ATTESTORS,
         "url": [SPOT_BALANCE_URL]
     });
     pv.task_id = task_id.to_string();
@@ -217,7 +209,7 @@ fn app_spot(
     //
     // 2. Do some valid checks
     // In the vast majority of cases, it is legal. Data is extracted while the inspection is conducted.
-    let msg_len = messages[0].len();
+    let msg_len = messages.len();
     let requests = attestation_data.public_data[0].attestation.request.clone();
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
@@ -252,7 +244,7 @@ fn app_spot(
 
         {
             // uid
-            let json_value = messages[0][i]
+            let json_value = messages[i]
                 .get_json_values(&uid_paths)
                 .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
 
@@ -264,7 +256,7 @@ fn app_spot(
 
         {
             // balance
-            let json_value = messages[0][i]
+            let json_value = messages[i]
                 .get_json_values(&bal_paths)
                 .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
 
