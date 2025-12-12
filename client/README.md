@@ -28,7 +28,7 @@ npm install
     You may add additional pairs (`BINANCE_API_KEY2`, `BINANCE_API_SECRET2`, etc.) for multi-account support.
 
 4. **Configure blockchain settings (optional)**
-    Adjust `CHAIN_ID` and `RPC_URL` as needed. Defaults target **Base Mainnet**:
+    Adjust `RPC_URL` as needed. Defaults target **Base Mainnet**:
 
     | CHAIN_ID | RPC_URL                  | Chain        |
     | -------- | ------------------------ | ------------ |
@@ -123,7 +123,6 @@ Below is a complete description of all fields defined in `.env.example`.
 
 | Variable      | Required | Description                                |
 | ------------- | -------- | ------------------------------------------ |
-| `CHAIN_ID`    | Optional | Chain ID (default: Base Mainnet = `8453`). |
 | `RPC_URL`     | Optional | RPC endpoint for the selected chain.       |
 | `PRIVATE_KEY` | Optional | Wallet private key for signing operations. |
 
