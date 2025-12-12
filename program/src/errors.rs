@@ -1,8 +1,8 @@
 #[repr(i16)]
 #[derive(Clone)]
 pub enum ZkErrorCode {
-    ParseAttestationData = 1001,
-    GetAttestorAddressFail,
+    InvalidAttestationLength = 1001,
+    ParseConfigData,
     VerifyAttestation,
     InvalidRequestLength,
     InvalidMessagesLength,
@@ -13,11 +13,6 @@ pub enum ZkErrorCode {
     InvalidRequestOrder,
     InvalidRequestUrl,
     DuplicateAccount,
-    GetTaskIdFail,
-    GetReportTxHashFail,
-    GetSpotDataFail,
-    GetUnifiedDataFail,
-    ParseConfigData,
 }
 
 pub struct ZktlsError {

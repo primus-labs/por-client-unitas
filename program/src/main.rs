@@ -32,40 +32,18 @@ fn app_unified(
     asset_bals: &mut HashMap<String, f64>,
 ) -> Result<(), ZktlsError> {
     //
-    // 0. Make attestation config
-    let v: serde_json::Value = serde_json::from_str(&attestation_data)
-        .map_err(|e| zkerr!(ZkErrorCode::ParseAttestationData, e.to_string()))?;
-    let task_id = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("taskId"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetTaskIdFail))?;
-    let report_tx_hash = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("reportTxHash"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetReportTxHashFail))?;
-    let attestor_addr = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("attestor"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    pv.task_id = task_id.to_string();
-    pv.report_tx_hash = report_tx_hash.to_string();
-    pv.attestor = attestor_addr.to_string();
-    pv.base_urls.push(RISK_URL.to_string());
-    pv.base_urls.push(BALANCE_URL.to_string());
-
-    //
     // 1. Verify
     let mut attestation_config = attestation_config.clone();
     attestation_config.url = UNIFIED_URL.iter().map(|s| s.to_string()).collect();
     let attestation_config = serde_json::to_string(&attestation_config).unwrap();
     let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
         .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
+
+    pv.task_id = attestation_data.public_data[0].taskId.clone();
+    pv.report_tx_hash = attestation_data.public_data[0].reportTxHash.clone();
+    pv.attestor = attestation_data.public_data[0].attestor.clone();
+    pv.base_urls.push(RISK_URL.to_string());
+    pv.base_urls.push(BALANCE_URL.to_string());
 
     //
     // 2. Do some valid checks
@@ -167,39 +145,17 @@ fn app_spot(
     asset_bals: &mut HashMap<String, f64>,
 ) -> Result<(), ZktlsError> {
     //
-    // 0. Make attestation config
-    let v: serde_json::Value = serde_json::from_str(&attestation_data)
-        .map_err(|e| zkerr!(ZkErrorCode::ParseAttestationData, e.to_string()))?;
-    let task_id = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("taskId"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetTaskIdFail))?;
-    let report_tx_hash = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("reportTxHash"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetReportTxHashFail))?;
-    let attestor_addr = v
-        .get("public_data")
-        .and_then(|pd| pd.get(0))
-        .and_then(|item| item.get("attestor"))
-        .and_then(|a| a.as_str())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetAttestorAddressFail))?;
-    pv.task_id = task_id.to_string();
-    pv.report_tx_hash = report_tx_hash.to_string();
-    pv.attestor = attestor_addr.to_string();
-    pv.base_urls.push(SPOT_BALANCE_URL.to_string());
-
-    //
     // 1. Verify
     let mut attestation_config = attestation_config.clone();
     attestation_config.url = SPOT_URL.iter().map(|s| s.to_string()).collect();
     let attestation_config = serde_json::to_string(&attestation_config).unwrap();
     let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
         .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
+
+    pv.task_id = attestation_data.public_data[0].taskId.clone();
+    pv.report_tx_hash = attestation_data.public_data[0].reportTxHash.clone();
+    pv.attestor = attestation_data.public_data[0].attestor.clone();
+    pv.base_urls.push(SPOT_BALANCE_URL.to_string());
 
     //
     // 2. Do some valid checks
@@ -282,33 +238,22 @@ fn app_spot(
     Ok(())
 }
 fn app_main(pv: &mut PublicValuesStruct) -> Result<(), ZktlsError> {
-    let attestation_data: String = sp1_zkvm::io::read();
     let config_data: String = sp1_zkvm::io::read();
+    let attestations: Vec<String> = sp1_zkvm::io::read(); // 0:Unified; 1:Spot
+    ensure_zk!(attestations.len() == 2, zkerr!(ZkErrorCode::InvalidAttestationLength));
+
     let attestation_config: AttestationConfig =
         serde_json::from_str(&config_data).map_err(|e| zkerr!(ZkErrorCode::ParseConfigData, e.to_string()))?;
-
-    // Get Unified and Spot data
-    let v: serde_json::Value = serde_json::from_str(&attestation_data)
-        .map_err(|e| zkerr!(ZkErrorCode::ParseAttestationData, e.to_string()))?;
-    let unified_data = v
-        .get("unified")
-        .map(|a| a.to_string())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetUnifiedDataFail))?;
-
-    let spot_data = v
-        .get("spot")
-        .map(|a| a.to_string())
-        .ok_or_else(|| zkerr!(ZkErrorCode::GetSpotDataFail))?;
-
-    // Verify Unified and Spot
     let mut asset_bals: HashMap<String, f64> = HashMap::new();
 
+    // Unified
     let mut unified_am = AttestationMetaStruct::default();
-    app_unified(&mut unified_am, &unified_data, &attestation_config, &mut asset_bals)?;
+    app_unified(&mut unified_am, &attestations[0], &attestation_config, &mut asset_bals)?;
     pv.attestation_meta.push(unified_am);
 
+    // Spot
     let mut spot_am = AttestationMetaStruct::default();
-    app_spot(&mut spot_am, &spot_data, &attestation_config, &mut asset_bals)?;
+    app_spot(&mut spot_am, &attestations[1], &attestation_config, &mut asset_bals)?;
     pv.attestation_meta.push(spot_am);
 
     // Summary assets by Category
