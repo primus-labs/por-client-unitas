@@ -1,6 +1,7 @@
 import { DataSource, PoRClient } from "@primuslabs/por-client-sdk";
 
 async function main() {
+  console.log(`Now: ${new Date()}`);
   try {
     const ds = new DataSource.Binance();
     const requestParams1 = ds.getUnifiedAccountRequests();
@@ -15,4 +16,7 @@ async function main() {
   }
 }
 
-main()
+const interval = Number(process.env.INTERVAL) || 1800;
+console.log(`The interval: ${interval} s.`)
+main();
+setInterval(main, interval * 1000);
