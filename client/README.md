@@ -21,11 +21,11 @@ npm install
     Provide at least one Binance API key pair:
 
     ```env
-    BINANCE_API_KEY1=...
-    BINANCE_API_SECRET1=...
+    BINANCE_API_KEY=...
+    BINANCE_API_SECRET=...
     ```
 
-    You may add additional pairs (`BINANCE_API_KEY2`, `BINANCE_API_SECRET2`, etc.) for multi-account support.
+    You may add additional pairs (`BINANCE_API_KEY1`, `BINANCE_API_SECRET1`, etc.) for multi-account support.
 
 4. **Configure blockchain settings (optional)**
     Adjust `RPC_URL` as needed. Defaults target **Base Mainnet**:
@@ -34,45 +34,12 @@ npm install
     | -------- | ------------------------ | ------------ |
     | 8453     | https://mainnet.base.org | Base Mainnet |
     | 84532    | https://sepolia.base.org | Base Sepolia |
- 
-5. **Set zkTLS mode (optional)**
-    The default `ZKTLS_MODE` is `POR`. If you want to change the mode to `DVC`, please also set your `PRIVATE_KEY`.
 
-6. **Upload the zkVM program**
-    (Refer to the [program README](../program/README.md) for compilation instructions.)
+5. **Run the client**
 
     ```sh
-    npx por-cli uploadProgram --filepath ../program/target/elf-compilation/riscv32im-succinct-zkvm-elf/release/zktls-program
+    docker compose up
     ```
-
-   After uploading, set the returned program ID as `PROGRAM_ID` in your `.env`.
-
-7. **Run the client**
-
-    ```sh
-    npx tsx src/binance.ts 
-    ```
-
-## Docker Build and Run
-
-**Build the Docker image**
-
-```sh
-sudo docker build -t primuslabs/por-client-unitas:v0.1.0 .
-```
-
-**Run the container**
-
-```sh
-docker run --rm --env-file .env primuslabs/por-client-unitas:v0.1.3
-```
-
-**Or use Docker Compose**
-
-```sh
-docker compose up
-```
-
 
 ## Configuration
 
@@ -124,14 +91,4 @@ Below is a complete description of all fields defined in `.env.example`.
 | Variable      | Required | Description                                |
 | ------------- | -------- | ------------------------------------------ |
 | `RPC_URL`     | Optional | RPC endpoint for the selected chain.       |
-| `PRIVATE_KEY` | Optional | Wallet private key for signing operations. |
-
-
-## 6. **zkTLS Mode**
-
-| Variable     | Required | Description                           |
-| ------------ | -------- | ------------------------------------- |
-| `ZKTLS_MODE` | Optional | zkTLS mode: `POR` (default) or `DVC`. |
-
-* If `ZKTLS_MODE=DVC`, a valid `PRIVATE_KEY` **must** be provided.
 
