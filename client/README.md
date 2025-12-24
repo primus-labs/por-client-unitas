@@ -48,47 +48,29 @@ The client relies on environment variables for authentication, program execution
 Below is a complete description of all fields defined in `.env.example`.
 
 
-## 1. **User Configuration (Required)**
-
-| Variable     | Required   | Description                                      |
-| ------------ | ---------- | ------------------------------------------------ |
-| `TOKEN`      | ✔ Required | Authentication token assigned by Primus Labs.    |
-| `PROJECT_ID` | ✔ Required | Project identifier associated with your account. |
-
-
-## 2. **Program Configuration (Required)**
-
-| Variable     | Required   | Description                                               |
-| ------------ | ---------- | --------------------------------------------------------- |
-| `PROGRAM_ID` | ✔ Required | Program ID returned after uploading your zkVM executable. |
-
-
-## 3. **Binance API Configuration**
+| Env Variable  | Required / Conditions | Default                    | Description                                                |
+| ------------- | --------------------- | -------------------------- | ---------------------------------------------------------- |
+| `TOKEN`       | Required              | `""`                       | Authentication token assigned by Primus Labs.              |
+| `PROJECT_ID`  | Required              | `""`                       | Project identifier associated with your account.           |
+| `PROGRAM_ID`  | Required              | `""`                       | Program identifier for zkVM execution.                     |
+| `LOG_VERBOSE` | Optional              | `0`                        | Logging verbosity level (`0` = off; higher = more detail). |
+| `RPC_URL`     | Optional              | `https://mainnet.base.org` | RPC endpoint for blockchain interactions.                  |
 
 
 
-| Variable                | Required   | Description                                                         |
-| ----------------------- | ---------- | ------------------------------------------------------------------- |
-| `BINANCE_API_KEY{i}`    | ✔ Required | API key for Binance account.                                        |
-| `BINANCE_API_SECRET{i}` | ✔ Required | API secret for Binance account.                                     |
-| `BINANCE_RECV_WINDOW`   | Optional   | Receive window in seconds for Binance API requests (default: `60`). |
+### Binance API Configuration
 
-* At least **one** `(API_KEY, API_SECRET)` pair must be provided.
+| Env Variable          | Required / Conditions | Default | Description                                         |
+| --------------------- | --------------------- | ------- | --------------------------------------------------- |
+| `BINANCE_API_KEY`     | Required              | `""`    | API key for Binance account.                        |
+| `BINANCE_API_SECRET`  | Required              | `""`    | API secret for Binance account.                     |
+| `BINANCE_RECV_WINDOW` | Optional              | `60`    | Receive window in seconds for Binance API requests. |
 
-
-## 4. **Other Settings (Optional)**
-
-| Variable           | Required | Description                                                        |
-| ------------------ | -------- | ------------------------------------------------------------------ |
-| `INTERVAL`         | Optional | Worker execution interval (seconds). Default: `1800` (30 minutes). |
-| `LOG_VERBOSE`      | Optional | Logging verbosity (`0` = off; higher numbers = more detail).       |
-| `ZKVM_SERVICE_URL` | Optional | Endpoint of the zkVM service.                                      |
+* You may add additional pairs (`BINANCE_API_KEY1`, `BINANCE_API_SECRET1`, etc.) for multi-account support.
 
 
-## 5. **Blockchain Configuration (Optional)**
+### Others
 
-
-| Variable      | Required | Description                                |
-| ------------- | -------- | ------------------------------------------ |
-| `RPC_URL`     | Optional | RPC endpoint for the selected chain.       |
-
+| Env Variable | Required / Conditions | Default | Description                           |
+| ------------ | --------------------- | ------- | ------------------------------------- |
+| `INTERVAL`   | Optional              | `1800`  | Worker execution interval in seconds. |
