@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@primuslabs/por-client-sdk": "file:../../por-client-sdk",
+    "@primuslabs/por-client-sdk": "0.1.0",
     "ccxt": "^4.5.11",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
