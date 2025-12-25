@@ -1,7 +1,7 @@
 
 ## Overview
 
-Here provides a client that interacts with Primus Network and zkVM program. It supports uploading zkVM programs, executing proof requests, etc.. Docker builds are also supported for deployment.
+Here provides a client that interacts with Primus Network and zkVM program. Docker builds are also supported for deployment.
 
 ## Build
 
@@ -15,7 +15,7 @@ npm install
     Copy `.env.example` to `.env`.
 
 2. **Set authentication parameters**
-    Contact **Primus Labs** to obtain your `TOKEN` and `PROJECT_ID`, then set them in `.env`.
+    Contact **Primus Labs** to obtain your `TOKEN`, `PROJECT_ID` and `PROGRAM_ID`, then set them in `.env`.
 
 3. **Configure Binance API keys**
     Provide at least one Binance API key pair:
