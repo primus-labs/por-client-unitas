@@ -8,9 +8,13 @@ async function main() {
     const requestParams2 = ds.getSpotAccountRequests();
 
     const client = new PoRClient();
-    const result = await client.run([requestParams1, requestParams2]);
-    // console.log("result", result);
-    console.log('proof fixture(json):', JSON.parse(result?.details?.proof_fixture ?? "{}"));
+    const result = await client.run([requestParams1, requestParams2], {
+      requestParamsCallback: [
+        () => ds.getUnifiedAccountRequests(),
+        () => ds.getSpotAccountRequests(),
+      ]
+    });
+    console.log('proof fixture(json):', JSON.parse(result?.proof_fixture ?? "{}"));
   } catch (err: any) {
     console.log("err:", err);
   }
