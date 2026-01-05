@@ -2,19 +2,46 @@
 
 ## Overview
 
-This project is composed of two main components: **[client](./client/README.md)** and **[program](./program/README.md)**.
+This project verifies asset balances across multiple exchanges and account types, with support for **simultaneous zero-knowledge proofs over multiple accounts**.
 
-* **Client**: Provides user-facing functionality to upload programs, submit tasks, and retrieve results.
-* **Program**: Developed and compiled by users according to their business logic, then executed within a zkVM inside a TEE to generate proofs.
+It is composed of two main components:
 
-The system enables verification of asset balances for Binance **spot** and **unified accounts**, with support for **simultaneous proofs across multiple accounts**.
+* **[Client](./client/README.md)**: Provides user-facing functionality to configure exchanges, generate zkTLS attestations, submit tasks, and retrieve proof results.
 
-### Workflow
+* **[Program](./program/README.md)**: User-defined business logic compiled and executed inside a **zkVM** running within a **TEE**, responsible for verification, asset aggregation, and proof generation.
 
-1. Generate zkTLS **attestations** for account data via the **Primus Network**.
-2. Send the attestations to a **zkVM program** running inside a **TEE**.
-3. Execute verification and business logic in the zkVM (e.g., validate attestations, extract balances, aggregate assets).
-4. Produce zero-knowledge proofs using the **Succinct Network**.
+Together, these components enable privacy-preserving verification of exchange account balances using **zkTLS**, **TEE**, and **zero-knowledge proofs**.
 
-For a complete introduction, see [DVC-Intro](https://github.com/primus-labs/DVC-Intro).
+
+## Supported Exchanges and Account Types
+
+The system currently supports the following exchanges and account categories:
+
+### Binance
+
+* **Unified Account**
+  `https://papi.binance.com/papi/v1/balance`
+* **Spot Account**
+  `https://api.binance.com/api/v3/account`
+* **Futures Account (USDⓈ-M)**
+  `https://fapi.binance.com/fapi/v3/balance`
+
+### Aster
+
+* **Spot Account**
+  `https://sapi.asterdex.com/api/v1/account`
+* **Futures Account**
+  `https://fapi.asterdex.com/fapi/v2/balance`
+
+
+## Workflow
+
+1. Generate zkTLS **attestations** for exchange account data via the **Primus Network**.
+2. Submit the attestations to a **zkVM program** running inside a **TEE**.
+3. Execute verification and business logic inside the zkVM (e.g. validate attestations, extract balances, aggregate assets).
+4. Generate zero-knowledge proofs using the **Succinct Network**.
+5. Return proofs and verified results to the client.
+
+
+For a complete conceptual introduction, see **[DVC-Intro](https://github.com/primus-labs/DVC-Intro)**.
 

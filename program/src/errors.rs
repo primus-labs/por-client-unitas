@@ -1,8 +1,7 @@
 #[repr(i16)]
 #[derive(Clone)]
 pub enum ZkErrorCode {
-    InvalidAttestationLength = 1001,
-    ParseConfigData,
+    ParseConfigData = 1001,
     VerifyAttestation,
     InvalidRequestLength,
     InvalidMessagesLength,

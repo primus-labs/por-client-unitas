@@ -16,6 +16,6 @@ pub struct PublicValuesStruct {
     pub version: String,
     pub project_id: String,
     pub attestation_meta: Vec<AttestationMetaStruct>,
-    pub asset_balance: HashMap<String, f64>,
+    pub asset_balance: HashMap<String, HashMap<String, f64>>, // source => { asset => balance }
     pub status: i16,
 }

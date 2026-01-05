@@ -1,0 +1,287 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "PoR client configuration schema",
+  "definitions": {
+    "apiKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "API key used to authenticate with the exchange"
+    },
+    "apiSecret": {
+      "type": "string",
+      "minLength": 1,
+      "description": "API secret corresponding to the API key"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this exchange account is enabled"
+    },
+    "description": {
+      "type": "string",
+      "default": "",
+      "description": "Optional human-readable description for this account"
+    },
+    "binanceKind": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Supported Binance account types for this key",
+      "items": {
+        "enum": [
+          "spot",
+          "usds-futures",
+          "coin-futures",
+          "unified"
+        ]
+      }
+    },
+    "asterKind": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Supported Aster account types for this key",
+      "items": {
+        "enum": [
+          "spot",
+          "usds-futures"
+        ]
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "object",
+      "description": "Core application configuration",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "runtime",
+        "services",
+        "blockchain"
+      ],
+      "properties": {
+        "identity": {
+          "type": "object",
+          "description": "Application identity and authorization information",
+          "additionalProperties": false,
+          "required": [
+            "token",
+            "projectId",
+            "programId"
+          ],
+          "properties": {
+            "token": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Authentication token issued for this application"
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Unique project identifier"
+            },
+            "programId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Unique program identifier"
+            }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "description": "Runtime environment configuration",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "env",
+            "logVerbose"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$",
+              "description": "Application version in semantic versioning format (x.y.z)"
+            },
+            "env": {
+              "type": "string",
+              "enum": [
+                "development",
+                "production"
+              ],
+              "default": "production",
+              "description": "Runtime environment"
+            },
+            "logVerbose": {
+              "type": "integer",
+              "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "default": 0,
+              "description": "Log verbosity level (0 = off, higher = more detail)"
+            }
+          }
+        },
+        "services": {
+          "type": "object",
+          "description": "External service endpoints",
+          "additionalProperties": false,
+          "required": [
+            "zkvm",
+            "data"
+          ],
+          "properties": {
+            "zkvm": {
+              "type": "object",
+              "description": "zkVM service configuration",
+              "additionalProperties": false,
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "zkVM service endpoint URL"
+                }
+              }
+            },
+            "data": {
+              "type": "object",
+              "description": "Data service configuration",
+              "additionalProperties": false,
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "Data service endpoint URL"
+                }
+              }
+            }
+          }
+        },
+        "blockchain": {
+          "type": "object",
+          "description": "Blockchain connection and signer configuration",
+          "additionalProperties": false,
+          "required": [
+            "network",
+            "signer"
+          ],
+          "properties": {
+            "network": {
+              "type": "string",
+              "enum": [
+                "base",
+                "base-sepolia"
+              ],
+              "default": "base",
+              "description": "Target blockchain network"
+            },
+            "rpcUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Optional custom RPC URL. If not set, the default RPC for the selected network is used"
+            },
+            "signer": {
+              "type": "object",
+              "description": "Transaction signer configuration (required if subscriptionType is PLAN_SELF_PAID)",
+              "additionalProperties": false,
+              "required": [
+                "privateKey"
+              ],
+              "properties": {
+                "privateKey": {
+                  "type": "string",
+                  "description": "Private key used to sign blockchain transactions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "exchanges": {
+      "type": "object",
+      "description": "Exchange account configurations",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "binance": {
+          "type": "array",
+          "description": "Binance exchange account keys",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "apiKey",
+              "apiSecret"
+            ],
+            "properties": {
+              "apiKey": {
+                "$ref": "#/definitions/apiKey"
+              },
+              "apiSecret": {
+                "$ref": "#/definitions/apiSecret"
+              },
+              "enabled": {
+                "$ref": "#/definitions/enabled"
+              },
+              "description": {
+                "$ref": "#/definitions/description"
+              },
+              "kind": {
+                "$ref": "#/definitions/binanceKind"
+              }
+            }
+          }
+        },
+        "aster": {
+          "type": "array",
+          "description": "Aster exchange account keys",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "apiKey",
+              "apiSecret"
+            ],
+            "properties": {
+              "apiKey": {
+                "$ref": "#/definitions/apiKey"
+              },
+              "apiSecret": {
+                "$ref": "#/definitions/apiSecret"
+              },
+              "enabled": {
+                "$ref": "#/definitions/enabled"
+              },
+              "description": {
+                "$ref": "#/definitions/description"
+              },
+              "kind": {
+                "$ref": "#/definitions/asterKind"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "app",
+    "exchanges"
+  ],
+  "additionalProperties": false
+}

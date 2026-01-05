@@ -13,6 +13,6 @@ RUN curl -fsSL https://nodejs.org/dist/v22.16.0/node-v22.16.0-linux-x64.tar.xz -
 COPY ./package.json /app/package.json
 RUN npm config set registry https://registry.npmmirror.com && npm install
 
-COPY ./src/binance.ts /app/src/
+COPY ./src/all.ts /app/src/
 
-CMD ["npx", "tsx", "src/binance.ts"]
+CMD ["npx", "tsx", "src/all.ts"]
