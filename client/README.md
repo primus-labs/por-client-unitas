@@ -131,11 +131,12 @@ Contains application authorization and identification.
 
 Specifies the runtime environment and logging.
 
-| Field      | Type    | Default        | Description                                            | Example        |
-| ---------- | ------- | -------------- | ------------------------------------------------------ | -------------- |
-| version    | string  | -              | Application version in semantic version format (x.y.z) | `"1.0.0"`      |
-| env        | string  | `"production"` | Runtime environment (`development` or `production`)    | `"production"` |
-| logVerbose | integer | `0`            | Log verbosity (0 = off, higher = more detail)          | `3`            |
+| Field       | Type    | Default        | Description                                            | Example        |
+| ----------- | ------- | -------------- | ------------------------------------------------------ | -------------- |
+| version     | string  | -              | Application version in semantic version format (x.y.z) | `"1.0.0"`      |
+| env         | string  | `"production"` | Runtime environment (`development` or `production`)    | `"production"` |
+| logVerbose  | integer | `0`            | Log verbosity (default 0 = off, higher = more detail)  | `3`            |
+| jobInterval | integer | `1800`         | Interval between jobs in seconds (default 1800)        | `3600`         |
 
 #### 3. Services (`app.services`)
 

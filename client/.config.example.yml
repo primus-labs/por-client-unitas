@@ -16,6 +16,7 @@ app:
     version: "0.1.0" # semantic version (x.y.z)
     env: production # development | production
     logVerbose: 0 # 0 (silent) ~ 5 (debug)
+    jobInterval: 1800 # seconds
 
   # ------------------------------------------------------------------
   # External services

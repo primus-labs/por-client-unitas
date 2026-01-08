@@ -94,9 +94,7 @@
           "description": "Runtime environment configuration",
           "additionalProperties": false,
           "required": [
-            "version",
-            "env",
-            "logVerbose"
+            "version"
           ],
           "properties": {
             "version": {
@@ -124,7 +122,13 @@
                 5
               ],
               "default": 0,
-              "description": "Log verbosity level (0 = off, higher = more detail)"
+              "description": "Log verbosity level (default 0 = off, higher = more detail)"
+            },
+            "jobInterval": {
+              "type": "integer",
+              "default": 1800,
+              "minimum": 10,
+              "description": "Interval between jobs in seconds (default 1800)"
             }
           }
         },
