@@ -1,7 +1,3 @@
-// These two lines are necessary for the program to properly compile.
-//
-// Under the hood, we wrap your main function with some extra code so that it behaves properly
-// inside the zkVM.
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
@@ -645,9 +641,26 @@ fn app_aster(
     Ok(())
 }
 
+/// Helper function
+fn set_meta(pv: &mut PublicValuesStruct, attestations: &HashMap<String, String>) -> Result<(), ZktlsError> {
+    if let Some(meta) = attestations.get("__meta__") {
+        let meta: HashMap<String, String> =
+            serde_json::from_str(meta).map_err(|e| zkerr!(ZkErrorCode::ParseMetaData, e.to_string()))?;
+
+        pv.project_id = meta
+            .get("projectId")
+            .ok_or_else(|| zkerr!(ZkErrorCode::MissingProjectId))?
+            .to_owned();
+    }
+
+    Ok(())
+}
+
 fn app_main(pv: &mut PublicValuesStruct) -> Result<(), ZktlsError> {
     let config_data: String = sp1_zkvm::io::read();
     let attestations: HashMap<String, String> = sp1_zkvm::io::read();
+
+    set_meta(pv, &attestations)?;
 
     let attestation_config: AttestationConfig =
         serde_json::from_str(&config_data).map_err(|e| zkerr!(ZkErrorCode::ParseConfigData, e.to_string()))?;
@@ -662,7 +675,6 @@ pub fn main() {
     let mut pv = PublicValuesStruct::default();
     pv.kind = "asset-balance".to_string();
     pv.version = "0.1.0".to_string();
-    pv.project_id = "2001569168033316864".to_string();
     if let Err(e) = app_main(&mut pv) {
         println!("Error: {} {}", e.icode(), e.msg());
         pv.status = e.icode();

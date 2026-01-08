@@ -1,7 +1,9 @@
 #[repr(i16)]
 #[derive(Clone)]
 pub enum ZkErrorCode {
-    ParseConfigData = 1001,
+    ParseMetaData = 1001,
+    ParseConfigData,
+    MissingProjectId,
     VerifyAttestation,
     InvalidRequestLength,
     InvalidMessagesLength,
