@@ -1,4 +1,4 @@
-# DVC-Succinct-Program
+# zkVM-Program
 
 ## Prerequisite
 
