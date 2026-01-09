@@ -6,7 +6,7 @@ Please refer to https://github.com/primus-labs/por-demo .
 
 ## Run
 
-Refer to https://github.com/primus-labs/por-client-unitas/client .
+Refer to [client](./client/README.md) .
 
 ## Supported Exchanges and Account Types
 
