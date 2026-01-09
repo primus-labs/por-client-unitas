@@ -24,15 +24,14 @@ app:
     projectId: "<YOUR_PROJECT_ID>"
 ```
 
-### 3. Configure exchange API keys
+### 3. Configure data source API keys
 
-Configure one or more API key pairs for the supported exchanges.
-At least **one exchange** must be configured, and you may configure **multiple exchanges** simultaneously.
+Configure one or more API key pairs for the supported data source. At least **one data source** must be configured, and you may configure **multiple data sources** simultaneously.
 
 Example (Binance):
 
 ```yml
-exchanges: # at least one of: binance, aster
+datasource: # at least one of: binance, aster
   binance:
     - apiKey: "binance-key-123"
       apiSecret: "binance-secret-abc"
