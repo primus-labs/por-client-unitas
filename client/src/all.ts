@@ -1,4 +1,4 @@
-import { Scheduler, DataSource, PoRClient, loadConfigFromFile } from "@primuslabs/por-client-sdk";
+import { Scheduler, DatasourceManager, PoRClient, loadConfigFromFile } from "@primuslabs/por-client-sdk";
 
 const config = loadConfigFromFile();
 let withdrawTime = Date.now();
@@ -6,7 +6,7 @@ const WITHDRAW_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
 async function main() {
   const config = loadConfigFromFile();
   const client = new PoRClient(config.app);
-  const ds = new DataSource.ExchangeManager(config.exchanges);
+  const ds = new DatasourceManager(config.datasource);
 
   try {
     const params = {

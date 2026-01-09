@@ -2,11 +2,11 @@
 
 ## Overview
 
-Please refer to https://github.com/primus-labs/por-demo .
+Please refer to https://github.com/primus-labs/por-demo.
 
 ## Run
 
-Refer to [client](./client/README.md) .
+Refer to [client](./client/README.md).
 
 ## Supported Exchanges and Account Types
 

@@ -56,10 +56,10 @@
       "description": "Core application configuration",
       "additionalProperties": false,
       "required": [
-        "identity",
-        "runtime",
-        "services",
-        "blockchain"
+        // "runtime",
+        // "services",
+        // "blockchain",
+        "identity"
       ],
       "properties": {
         "identity": {
@@ -131,8 +131,8 @@
           "description": "External service endpoints",
           "additionalProperties": false,
           "required": [
-            "zkvm",
-            "data"
+            // "zkvm",
+            // "data"
           ],
           "properties": {
             "zkvm": {
@@ -140,7 +140,7 @@
               "description": "zkVM service configuration",
               "additionalProperties": false,
               "required": [
-                "url"
+                // "url"
               ],
               "properties": {
                 "url": {
@@ -155,7 +155,7 @@
               "description": "Data service configuration",
               "additionalProperties": false,
               "required": [
-                "url"
+                // "url"
               ],
               "properties": {
                 "url": {
@@ -172,8 +172,8 @@
           "description": "Blockchain connection and signer configuration",
           "additionalProperties": false,
           "required": [
-            "network",
-            "signer"
+            // "signer",
+            "network"
           ],
           "properties": {
             "network": {
@@ -208,9 +208,9 @@
         }
       }
     },
-    "exchanges": {
+    "datasource": {
       "type": "object",
-      "description": "Exchange account configurations",
+      "description": "Datasource account configurations",
       "minProperties": 1,
       "additionalProperties": false,
       "properties": {
@@ -279,7 +279,7 @@
   },
   "required": [
     "app",
-    "exchanges"
+    "datasource"
   ],
   "additionalProperties": false
 }

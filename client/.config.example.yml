@@ -9,46 +9,27 @@ app:
     projectId: "<YOUR_PROJECT_ID>"
 
   # ------------------------------------------------------------------
-  # Runtime configuration
-  # ------------------------------------------------------------------
-  runtime:
-    version: "0.1.0" # semantic version (x.y.z)
-    env: production # development | production
-    logVerbose: 0 # 0 (silent) ~ 5 (debug)
-    jobInterval: 1800 # seconds
-
-  # ------------------------------------------------------------------
-  # External services
-  # ------------------------------------------------------------------
-  services:
-    zkvm:
-      url: https://api-por.primuslabs.xyz:38080
-    data:
-      url: https://api-por-data.primuslabs.xyz/por-admin
-
-  # ------------------------------------------------------------------
   # Blockchain configuration
   # ------------------------------------------------------------------
   blockchain:
     network: base # base | base-sepolia
-    rpcUrl: "https://mainnet.base.org" # optional, override default RPC
 
     # Required only if subscription type is PLAN_SELF_PAID
     signer:
       privateKey: "<PRIVATE_KEY>"
 
 # --------------------------------------------------------------------
-# Exchange API configurations
-# At least one exchange must be configured: binance or aster
+# Data source configurations
+# At least one datasource must be configured: binance or aster
 # --------------------------------------------------------------------
-exchanges:
+datasource:
   binance:
     # Binance account #1
     - apiKey: "binance-key-123"
       apiSecret: "binance-secret-abc"
       kind: ["spot", "usds-futures"] # spot | usds-futures | coin-futures | unified
 
-    # Binance account #2 (disabled)
+    # Binance account #2 (disabled by set enabled to false)
     - apiKey: "binance-key-456"
       apiSecret: "binance-secret-def"
       kind: ["spot", "unified"]
