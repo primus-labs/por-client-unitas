@@ -5,9 +5,8 @@ app:
   # Application identity (provided by Primus Labs)
   # ------------------------------------------------------------------
   identity:
-    token: "<YOUR_TOKEN>"
+    userToken: "<YOUR_TOKEN>"
     projectId: "<YOUR_PROJECT_ID>"
-    programId: "<YOUR_PROGRAM_ID>"
 
   # ------------------------------------------------------------------
   # Runtime configuration
@@ -25,14 +24,14 @@ app:
     zkvm:
       url: https://api-por.primuslabs.xyz:38080
     data:
-      url: http://api-dev.padolabs.org:38101
+      url: https://api-por-data.primuslabs.xyz/por-admin
 
   # ------------------------------------------------------------------
   # Blockchain configuration
   # ------------------------------------------------------------------
   blockchain:
-    network: base-sepolia # base | base-sepolia
-    rpcUrl: "https://sepolia.base.org" # optional, override default RPC
+    network: base # base | base-sepolia
+    rpcUrl: "https://mainnet.base.org" # optional, override default RPC
 
     # Required only if subscription type is PLAN_SELF_PAID
     signer:

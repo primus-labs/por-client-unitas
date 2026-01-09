@@ -67,12 +67,11 @@
           "description": "Application identity and authorization information",
           "additionalProperties": false,
           "required": [
-            "token",
-            "projectId",
-            "programId"
+            "userToken",
+            "projectId"
           ],
           "properties": {
-            "token": {
+            "userToken": {
               "type": "string",
               "minLength": 1,
               "description": "Authentication token issued for this application"
@@ -81,11 +80,6 @@
               "type": "string",
               "minLength": 1,
               "description": "Unique project identifier"
-            },
-            "programId": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Unique program identifier"
             }
           }
         },

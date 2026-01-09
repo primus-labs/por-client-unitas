@@ -8,7 +8,7 @@ It is composed of two main components:
 
 * **[Client](./client/README.md)**: Provides user-facing functionality to configure exchanges, generate zkTLS attestations, submit tasks, and retrieve proof results.
 
-* **[Program](./program/README.md)**: User-defined business logic compiled and executed inside a **zkVM** running within a **TEE**, responsible for verification, asset aggregation, and proof generation.
+* **[zkVM Program](./zkvm-program/README.md)**: User-defined business logic compiled and executed inside a **zkVM** running within a **TEE**, responsible for verification, asset aggregation, and proof generation.
 
 Together, these components enable privacy-preserving verification of exchange account balances using **zkTLS**, **TEE**, and **zero-knowledge proofs**.
 

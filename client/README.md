@@ -23,18 +23,16 @@ cp .config.example.yml .config.yml
 
 Contact **Primus Labs** to obtain your:
 
-* `token`
+* `userToken`
 * `projectId`
-* `programId`
 
 Then configure them under `app.identity` in `.config.yml`:
 
 ```yml
 app:
   identity:
-    token: "<YOUR_TOKEN>"
+    userToken: "<YOUR_TOKEN>"
     projectId: "<YOUR_PROJECT_ID>"
-    programId: "<YOUR_PROGRAM_ID>"
 ```
 
 ### 3. Configure exchange API keys
