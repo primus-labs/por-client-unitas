@@ -673,8 +673,8 @@ fn app_main(pv: &mut PublicValuesStruct) -> Result<(), ZktlsError> {
 
 pub fn main() {
     let mut pv = PublicValuesStruct::default();
-    pv.kind = "asset-balance".to_string();
     pv.version = "0.1.0".to_string();
+    pv.kind = "asset-balance".to_string();
     if let Err(e) = app_main(&mut pv) {
         println!("Error: {} {}", e.icode(), e.msg());
         pv.status = e.icode();
