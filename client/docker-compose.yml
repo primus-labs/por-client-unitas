@@ -1,9 +1,10 @@
 services:
   por-client-unitas:
     # build: .
-    image: primuslabs/por-client-unitas:v0.1.1
+    image: primuslabs/por-client-unitas:v0.1.2
     container_name: por-client-unitas
+    working_dir: /app
     volumes:
+      - ./:/app
       - ./.config.yml:/app/.config.yml:ro
-      - ./.state.json:/app/.state.json
     restart: always
