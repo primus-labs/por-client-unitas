@@ -5,4 +5,5 @@ services:
     container_name: por-client-unitas
     volumes:
       - ./.config.yml:/app/.config.yml:ro
+      - ./.state.json:/app/.state.json
     restart: always

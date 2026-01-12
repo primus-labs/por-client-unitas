@@ -9,3 +9,4 @@ package-lock.json
 /*attestation*.json
 
 .config.yml
+.state.json
