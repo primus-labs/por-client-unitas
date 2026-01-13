@@ -615,7 +615,7 @@ fn app_aster(
         app_aster_spot(&mut spot_am, &spot_data, attestation_config, &mut asset_bals)?;
         pv.attestation_meta.push(spot_am);
     }
-    if let Some(future_data) = attestations.get("asterFuture") {
+    if let Some(future_data) = attestations.get("asterUsdSFuture") {
         let mut future_am = AttestationMetaStruct::default();
         app_aster_future(&mut future_am, &future_data, attestation_config, &mut asset_bals)?;
         pv.attestation_meta.push(future_am);
