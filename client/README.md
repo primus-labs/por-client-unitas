@@ -10,7 +10,7 @@ cp .config.example.yml .config.yml
 
 ### 2. Set authentication parameters
 
-Contact **Primus Labs** to obtain your:
+Contact **Primus Labs** to obtain your(The userToken is the user's credentials, please keep it confidential):
 
 * `userToken`
 * `projectId`
