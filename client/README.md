@@ -10,7 +10,7 @@ cp .config.example.yml .config.yml
 
 ### 2. Set authentication parameters
 
-Contact **Primus Labs** to obtain your(The userToken is the user's credentials, please keep it confidential):
+Contact **Primus Labs** to obtain your:
 
 * `userToken`
 * `projectId`
@@ -52,7 +52,7 @@ app:
 Start the client using Docker Compose:
 
 ```sh
-docker compose up
+docker compose up -d
 ```
 
 **Notes**: If you update the configuration (for example, adding, modifying, or removing API key pairs), simply edit `.config.yml`. The changes will automatically take effect **in the next execution loop**, without restarting the container.
