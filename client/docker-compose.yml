@@ -1,7 +1,7 @@
 services:
   por-client-unitas:
     # build: .
-    image: primuslabs/por-client-unitas:v0.1.1
+    image: primuslabs/por-client-unitas:v0.1.2
     container_name: por-client-unitas
     volumes:
       - ./.config.yml:/app/.config.yml:ro

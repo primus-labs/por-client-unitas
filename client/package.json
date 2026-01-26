@@ -1,16 +1,16 @@
 {
   "name": "por-client-unitas",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.1.2",
+  "author": "Primus Labs <dev@primuslabs.org>",
+  "description": "Primus PoR client for Unitas",
   "license": "ISC",
-  "author": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@primuslabs/por-client-sdk": "0.1.8",
+    "@primuslabs/por-client-sdk": "0.1.10",
     "ccxt": "^4.5.11",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2"

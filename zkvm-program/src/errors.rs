@@ -9,8 +9,6 @@ pub enum ZkErrorCode {
     InvalidMessagesLength,
     GetJsonValueFail,
     InvalidJsonValueSize,
-    CannotFoundTimestamp,
-    ParseTimestampFailed,
     InvalidRequestOrder,
     InvalidRequestUrl,
     DuplicateAccount,

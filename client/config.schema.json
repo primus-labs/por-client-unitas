@@ -32,7 +32,8 @@
           "spot",
           "usds-futures",
           "coin-futures",
-          "unified"
+          "unified",
+          "margin"
         ]
       }
     },

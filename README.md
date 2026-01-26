@@ -23,6 +23,9 @@ The system currently supports the following exchanges and account categories:
 * **Futures Account (USDⓈ-M)**
   `https://fapi.binance.com/fapi/v3/balance`
   [API DOC](https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Futures-Account-Balance-V3)
+* **Margin Account**
+  `https://api.binance.com/sapi/v1/margin/isolated/account`
+  [API DOC](https://developers.binance.com/docs/margin_trading/account/Query-Isolated-Margin-Account-Info)
 
 ### Aster
 

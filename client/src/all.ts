@@ -13,6 +13,7 @@ async function main() {
       binanceSpot: () => ds.binance?.getSpotAccountInfoRequests(),
       binanceUsdSFuture: () => ds.binance?.getUsdSFutureAccountBalanceV3Requests(),
       binanceUnified: () => ds.binance?.getUnifiedAccountBalanceRequests(),
+      binanceMargin: () => ds.binance?.getMarginAccountBalanceRequests(),
       asterSpot: () => ds.aster?.getSpotAccountRequests(),
       asterUsdSFuture: () => ds.aster?.getUsdSFutureBalanceRequests(),
     };
