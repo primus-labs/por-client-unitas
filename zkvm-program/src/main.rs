@@ -245,6 +245,7 @@ fn app_binance_unified(
     bal_paths.push("$.[*].asset");
     bal_paths.push("$.[*].totalWalletBalance");
     bal_paths.push("$.[*].umUnrealizedPNL");
+    bal_paths.push("$.[*].crossMarginBorrowed");
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut um_prices = vec![];
@@ -292,7 +293,8 @@ fn app_binance_unified(
                 let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
                 let bal: f64 = json_value[size + j].trim_matches('"').parse().unwrap_or(0.0);
                 let pnl: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
-                *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + pnl;
+                let bro: f64 = json_value[size * 3 + j].trim_matches('"').parse().unwrap_or(0.0);
+                *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + pnl - bro;
             }
         } else {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -344,9 +346,11 @@ fn app_binance_margin(
     bal_paths.push("$.assets[*].baseAsset.asset");
     bal_paths.push("$.assets[*].baseAsset.free");
     bal_paths.push("$.assets[*].baseAsset.locked");
+    bal_paths.push("$.assets[*].baseAsset.borrowed");
     bal_paths.push("$.assets[*].quoteAsset.asset");
     bal_paths.push("$.assets[*].quoteAsset.free");
     bal_paths.push("$.assets[*].quoteAsset.locked");
+    bal_paths.push("$.assets[*].quoteAsset.borrowed");
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
@@ -373,16 +377,18 @@ fn app_binance_margin(
                 let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
                 let free: f64 = json_value[size + j].trim_matches('"').parse().unwrap_or(0.0);
                 let locked: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
-                *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked;
-                let v = format!("{}:{}:{}", asset, free, locked);
+                let bro: f64 = json_value[size * 3 + j].trim_matches('"').parse().unwrap_or(0.0);
+                *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked - bro;
+                let v = format!("{}:{}:{}:{}", asset, free, locked, bro);
                 _uid.push(v);
 
                 {
-                    let asset = json_value[size * 3 + j].trim_matches('"').to_ascii_uppercase();
-                    let free: f64 = json_value[size * 4 + j].trim_matches('"').parse().unwrap_or(0.0);
-                    let locked: f64 = json_value[size * 5 + j].trim_matches('"').parse().unwrap_or(0.0);
-                    *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked;
-                    let v = format!("{}:{}:{}", asset, free, locked);
+                    let asset = json_value[size * 4 + j].trim_matches('"').to_ascii_uppercase();
+                    let free: f64 = json_value[size * 5 + j].trim_matches('"').parse().unwrap_or(0.0);
+                    let locked: f64 = json_value[size * 6 + j].trim_matches('"').parse().unwrap_or(0.0);
+                    let bro: f64 = json_value[size * 7 + j].trim_matches('"').parse().unwrap_or(0.0);
+                    *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked - bro;
+                    let v = format!("{}:{}:{}:{}", asset, free, locked, bro);
                     _uid.push(v);
                 }
             }
