@@ -1,6 +1,6 @@
 {
   "name": "por-client-unitas",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Primus Labs <dev@primuslabs.org>",
   "description": "Primus PoR client for Unitas",
   "license": "ISC",
