@@ -5,11 +5,9 @@ pub enum ZkErrorCode {
     ParseConfigData,
     MissingProjectId,
     VerifyAttestation,
-    InvalidRequestLength,
     InvalidMessagesLength,
     GetJsonValueFail,
     InvalidJsonValueSize,
-    InvalidRequestOrder,
     InvalidRequestUrl,
     DuplicateAccount,
 }

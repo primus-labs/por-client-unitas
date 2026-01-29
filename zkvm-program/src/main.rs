@@ -12,8 +12,7 @@ use errors::{ZkErrorCode, ZktlsError};
 mod structs;
 use structs::{AttestationMetaStruct, PublicValuesStruct};
 
-const RISK_URL: &str = "https://papi.binance.com/papi/v1/um/positionRisk";
-const BALANCE_URL: &str = "https://papi.binance.com/papi/v1/balance";
+const UNIFIED_BALANCE_URL: &str = "https://papi.binance.com/papi/v1/balance";
 const SPOT_BALANCE_URL: &str = "https://api.binance.com/api/v3/account";
 const FEATURE_BALANCE_URL: &str = "https://fapi.binance.com/fapi/v3/balance";
 const MARGIN_BALANCE_URL: &str = "https://api.binance.com/sapi/v1/margin/isolated/account";
@@ -216,7 +215,7 @@ fn app_binance_unified(
     //
     // 1. Verify
     let mut attestation_config = attestation_config.clone();
-    attestation_config.url = vec![RISK_URL.to_string(), BALANCE_URL.to_string()];
+    attestation_config.url = vec![UNIFIED_BALANCE_URL.to_string()];
     let attestation_config = serde_json::to_string(&attestation_config).unwrap();
     let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
         .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
@@ -224,8 +223,7 @@ fn app_binance_unified(
     pv.task_id = attestation_data.public_data[0].taskId.clone();
     pv.report_tx_hash = attestation_data.public_data[0].reportTxHash.clone();
     pv.attestor = attestation_data.public_data[0].attestor.clone();
-    pv.base_urls.push(RISK_URL.to_string());
-    pv.base_urls.push(BALANCE_URL.to_string());
+    pv.base_urls.push(UNIFIED_BALANCE_URL.to_string());
 
     //
     // 2. Do some valid checks
@@ -233,52 +231,26 @@ fn app_binance_unified(
     let msg_len = messages.len();
     let requests = attestation_data.public_data[0].attestation.request.clone();
     let requests_len = requests.len();
-    ensure_zk!(requests_len % 2 == 0, zkerr!(ZkErrorCode::InvalidRequestLength));
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
     let mut i = 0;
-    let mut um_paths = vec![];
-    um_paths.push("$.[*].symbol");
-    um_paths.push("$.[*].entryPrice");
-
     let mut bal_paths = vec![];
+
     bal_paths.push("$.[*].asset");
     bal_paths.push("$.[*].totalWalletBalance");
     bal_paths.push("$.[*].umUnrealizedPNL");
     bal_paths.push("$.[*].crossMarginBorrowed");
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
-    let mut um_prices = vec![];
-    // strict order: um1 bal1 um2 bal2 ...
+    let mut uids = vec![];
     for request in requests {
-        // check url and get assets' balance
-        if request.url.starts_with(RISK_URL) {
-            ensure_zk!(i % 2 == 0, zkerr!(ZkErrorCode::InvalidRequestOrder));
+        // check url
+        if !request.url.starts_with(UNIFIED_BALANCE_URL) {
+            return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
+        }
 
-            let json_value = messages[i]
-                .get_json_values(&um_paths)
-                .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
-
-            ensure_zk!(
-                json_value.len() % um_paths.len() == 0,
-                zkerr!(ZkErrorCode::InvalidJsonValueSize)
-            );
-
-            // Collects UM (asset => entryPrice) info
-            let mut prices = vec![];
-            let size = json_value.len() / um_paths.len();
-            for j in 0..size {
-                let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
-                let price = json_value[size + j].trim_matches('"').to_string();
-                let v = format!("{}:{}", asset, price);
-                prices.push(v);
-            }
-            prices.sort();
-            let um_price = prices.join(",");
-            if !um_price.is_empty() {
-                um_prices.push(um_price);
-            }
-        } else if request.url.starts_with(BALANCE_URL) {
+        {
+            // balance
             let json_value = messages[i]
                 .get_json_values(&bal_paths)
                 .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
@@ -288,6 +260,7 @@ fn app_binance_unified(
                 zkerr!(ZkErrorCode::InvalidJsonValueSize)
             );
 
+            let mut _uid = vec![];
             let size = json_value.len() / bal_paths.len();
             for j in 0..size {
                 let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
@@ -295,9 +268,14 @@ fn app_binance_unified(
                 let pnl: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
                 let bro: f64 = json_value[size * 3 + j].trim_matches('"').parse().unwrap_or(0.0);
                 *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + pnl - bro;
+                let v = format!("{}:{}:{}:{}", asset, bal, pnl, bro);
+                _uid.push(v);
             }
-        } else {
-            return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
+            _uid.sort();
+            let _uid = _uid.join(",");
+            if !_uid.is_empty() {
+                uids.push(_uid);
+            }
         }
 
         i += 1;
@@ -306,7 +284,7 @@ fn app_binance_unified(
     // Is the account duplicate?
     let mut seen = HashSet::new();
     ensure_zk!(
-        !um_prices.iter().any(|x| !seen.insert(x)),
+        !uids.iter().any(|x| !seen.insert(x)),
         zkerr!(ZkErrorCode::DuplicateAccount)
     );
 
@@ -642,12 +620,12 @@ fn app_binance(
         if STABLE_COINS.contains(&k.as_str()) {
             stablecoin_sum += v;
         } else {
-            if v > EPSILON_VALUE {
+            if v > EPSILON_VALUE || v < -EPSILON_VALUE {
                 asset_balance.insert(k, v);
             }
         }
     }
-    if stablecoin_sum > EPSILON_VALUE {
+    if stablecoin_sum > EPSILON_VALUE || stablecoin_sum < -EPSILON_VALUE {
         asset_balance.insert("STABLECOIN".to_string(), stablecoin_sum);
     }
     pv.asset_balance.insert("binance".to_string(), asset_balance);
@@ -681,12 +659,12 @@ fn app_aster(
         if STABLE_COINS.contains(&k.as_str()) {
             stablecoin_sum += v;
         } else {
-            if v > EPSILON_VALUE {
+            if v > EPSILON_VALUE || v < -EPSILON_VALUE {
                 asset_balance.insert(k, v);
             }
         }
     }
-    if stablecoin_sum > EPSILON_VALUE {
+    if stablecoin_sum > EPSILON_VALUE || stablecoin_sum < -EPSILON_VALUE {
         asset_balance.insert("STABLECOIN".to_string(), stablecoin_sum);
     }
     pv.asset_balance.insert("aster".to_string(), asset_balance);
