@@ -240,6 +240,7 @@ fn app_binance_unified(
     bal_paths.push("$.[*].totalWalletBalance");
     bal_paths.push("$.[*].umUnrealizedPNL");
     bal_paths.push("$.[*].crossMarginBorrowed");
+    bal_paths.push("$.[*].updateTime");
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
@@ -267,8 +268,9 @@ fn app_binance_unified(
                 let bal: f64 = json_value[size + j].trim_matches('"').parse().unwrap_or(0.0);
                 let pnl: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
                 let bro: f64 = json_value[size * 3 + j].trim_matches('"').parse().unwrap_or(0.0);
+                let tim = json_value[size * 4 + j].trim_matches('"').to_string();
                 *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + pnl - bro;
-                let v = format!("{}:{}:{}:{}", asset, bal, pnl, bro);
+                let v = format!("{}:{}:{}:{}:{}", asset, bal, pnl, bro, tim);
                 _uid.push(v);
             }
             _uid.sort();
@@ -351,12 +353,16 @@ fn app_binance_margin(
 
             let mut _uid = vec![];
             let size = json_value.len() / bal_paths.len();
+            let mut total_bal_of_one: f64 = 0.0;
             for j in 0..size {
                 let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
                 let free: f64 = json_value[size + j].trim_matches('"').parse().unwrap_or(0.0);
                 let locked: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
                 let bro: f64 = json_value[size * 3 + j].trim_matches('"').parse().unwrap_or(0.0);
-                *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked - bro;
+
+                let bal = free + locked - bro;
+                total_bal_of_one += bal;
+                *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal;
                 let v = format!("{}:{}:{}:{}", asset, free, locked, bro);
                 _uid.push(v);
 
@@ -365,15 +371,21 @@ fn app_binance_margin(
                     let free: f64 = json_value[size * 5 + j].trim_matches('"').parse().unwrap_or(0.0);
                     let locked: f64 = json_value[size * 6 + j].trim_matches('"').parse().unwrap_or(0.0);
                     let bro: f64 = json_value[size * 7 + j].trim_matches('"').parse().unwrap_or(0.0);
-                    *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked - bro;
+
+                    let bal = free + locked - bro;
+                    total_bal_of_one += bal;
+                    *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal;
                     let v = format!("{}:{}:{}:{}", asset, free, locked, bro);
                     _uid.push(v);
                 }
             }
-            _uid.sort();
-            let _uid = _uid.join(",");
-            if !_uid.is_empty() {
-                uids.push(_uid);
+
+            if total_bal_of_one > EPSILON_VALUE || total_bal_of_one < -EPSILON_VALUE {
+                _uid.sort();
+                let _uid = _uid.join(",");
+                if !_uid.is_empty() {
+                    uids.push(_uid);
+                }
             }
         }
 
