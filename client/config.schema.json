@@ -148,6 +148,12 @@
                   "type": "string",
                   "format": "uri",
                   "description": "zkVM service endpoint URL"
+                },
+                "getProofResultTimeout": {
+                  "type": "integer",
+                  "default": 2400,
+                  "minimum": 10,
+                  "description": "Get zkVM Proof result timeout in seconds (default 2400)"
                 }
               }
             },
