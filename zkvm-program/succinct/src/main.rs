@@ -2,7 +2,6 @@
 sp1_zkvm::entrypoint!(main);
 
 use anyhow::Result;
-use sp1_zkvm::io::commit;
 use std::collections::{HashMap, HashSet};
 use zktls_att_verification::attestation_data::verify_attestation_data;
 use zktls_att_verification::attestation_data::AttestationConfig;
@@ -724,5 +723,5 @@ pub fn main() {
     } else {
         println!("OK");
     }
-    commit(&pv);
+    sp1_zkvm::io::commit(&pv);
 }
