@@ -5,10 +5,4 @@ edition = "2021"
 
 [dependencies]
 sp1-zkvm = "5.2.2"
-serde_json = "1.0"
-anyhow = { version = "1.0.40", default-features = false }
-thiserror = "2.0.17"
-serde = { version = "1.0.200", default-features = false, features = ["derive"] }
-
-# zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", rev = "0221d80" }
-zktls-att-verification = { git = "https://github.com/primus-labs/zktls-att-verification.git", branch = "network-por" }
+common = { path = "../common" }
