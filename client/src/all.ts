@@ -18,7 +18,7 @@ async function main() {
       asterUsdSFuture: () => ds.aster?.getUsdSFutureBalanceRequests(),
     };
 
-    const result = await client.run(params);
+    const result = await client.run(params, { projectName: "unitas" });
     // console.log("result", JSON.stringify(result));
     console.log('proof fixture(json):', JSON.parse(result?.proof_fixture ?? "{}"));
   } catch (err: any) {
