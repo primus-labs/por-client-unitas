@@ -35,3 +35,9 @@ The system currently supports the following exchanges and account categories:
 * **Futures Account**
   `https://fapi.asterdex.com/fapi/v2/balance`
   [API DOC](https://github.com/asterdex/api-docs/blob/master/aster-finance-futures-api.md#futures-account-balance-v2-user_data)
+
+### Bybit
+
+* **Wallet Balance (UNIFIED)**
+  https://api.bybit.com/v5/account/wallet-balance
+  [API DOC](https://bybit-exchange.github.io/docs/v5/account/wallet-balance)

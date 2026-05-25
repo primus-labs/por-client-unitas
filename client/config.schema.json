@@ -4,12 +4,10 @@
   "definitions": {
     "apiKey": {
       "type": "string",
-      "minLength": 1,
       "description": "API key used to authenticate with the exchange"
     },
     "apiSecret": {
       "type": "string",
-      "minLength": 1,
       "description": "API secret corresponding to the API key"
     },
     "enabled": {
@@ -48,6 +46,21 @@
           "usds-futures"
         ]
       }
+    },
+    "generalKind": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Account types for this key",
+      "items": {
+        "enum": [
+          "main"
+        ]
+      }
+    },
+    "general": {
+      "type": "string",
+      "default": ""
     }
   },
   "type": "object",
@@ -277,6 +290,36 @@
               },
               "kind": {
                 "$ref": "#/definitions/asterKind"
+              }
+            }
+          }
+        },
+        "bybit": {
+          "type": "array",
+          "description": "Bybit exchange account keys",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "apiKey",
+              "apiSecret"
+            ],
+            "properties": {
+              "apiKey": {
+                "$ref": "#/definitions/apiKey"
+              },
+              "apiSecret": {
+                "$ref": "#/definitions/apiSecret"
+              },
+              "enabled": {
+                "$ref": "#/definitions/enabled"
+              },
+              "description": {
+                "$ref": "#/definitions/description"
+              },
+              "kind": {
+                "$ref": "#/definitions/generalKind"
               }
             }
           }

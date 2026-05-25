@@ -40,3 +40,9 @@ datasource:
     - apiKey: "aster-key-123"
       apiSecret: "aster-secret-abc"
       kind: ["spot", "usds-futures"] # spot | usds-futures
+
+  bybit:
+    - apiKey: "need-config"
+      apiSecret: "need-config"
+      kind: ["main"] # main
+      enabled: false

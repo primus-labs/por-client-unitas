@@ -16,6 +16,8 @@ async function main() {
       binanceMargin: () => ds.binance?.getMarginAccountBalanceRequests(),
       asterSpot: () => ds.aster?.getSpotAccountRequests(),
       asterUsdSFuture: () => ds.aster?.getUsdSFutureBalanceRequests(),
+
+      bybitUnified: () => ds.bybit?.getV5AccountWalletBalance(), // Bybit UNIFIED
     };
 
     const result = await client.run(params, { projectName: "unitas" });
@@ -41,7 +43,7 @@ async function main() {
 const scheduler = new Scheduler(main, {
   intervalMs: config.app.runtime.jobInterval * 1000, // ms
   stateFile: "/app/.state.json",
-  shouldStop: (err) => {
+  shouldStop: (err: any) => {
     if (err?.data?.code === "timeout") return true;
     return false;
   }
