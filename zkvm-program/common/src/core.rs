@@ -12,6 +12,7 @@ const UNIFIED_BALANCE_URL: &str = "https://papi.binance.com/papi/v1/balance";
 const SPOT_BALANCE_URL: &str = "https://api.binance.com/api/v3/account";
 const FEATURE_BALANCE_URL: &str = "https://fapi.binance.com/fapi/v3/balance";
 const MARGIN_BALANCE_URL: &str = "https://api.binance.com/sapi/v1/margin/isolated/account";
+const FUNDING_BALANCE_URL: &str = "https://api.binance.com/sapi/v1/asset/get-funding-asset";
 
 const ASTER_SPOT_BALANCE_URL: &str = "https://sapi.asterdex.com/api/v1/account";
 const ASTER_FEATURE_BALANCE_URL: &str = "https://fapi.asterdex.com/fapi/v2/balance";
@@ -399,6 +400,90 @@ fn app_binance_margin(
     Ok(())
 }
 
+fn app_binance_funding(
+    pv: &mut AttestationMetaStruct,
+    attestation_data: &String,
+    attestation_config: &AttestationConfig,
+    asset_bals: &mut HashMap<String, f64>,
+) -> Result<(), ZktlsError> {
+    //
+    // 1. Verify
+    let mut attestation_config = attestation_config.clone();
+    attestation_config.url = vec![FUNDING_BALANCE_URL.to_string()];
+    let attestation_config = serde_json::to_string(&attestation_config).unwrap();
+    let (attestation_data, _, messages) = verify_attestation_data(&attestation_data, &attestation_config)
+        .map_err(|e| zkerr!(ZkErrorCode::VerifyAttestation, e.to_string()))?;
+
+    pv.task_id = attestation_data.public_data[0].taskId.clone();
+    pv.report_tx_hash = attestation_data.public_data[0].reportTxHash.clone();
+    pv.attestor = attestation_data.public_data[0].attestor.clone();
+    pv.base_urls.push(FUNDING_BALANCE_URL.to_string());
+
+    //
+    // 2. Do some valid checks
+    // In the vast majority of cases, it is legal. Data is extracted while the inspection is conducted.
+    let msg_len = messages.len();
+    let requests = attestation_data.public_data[0].attestation.request.clone();
+    let requests_len = requests.len();
+    ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
+
+    let mut i = 0;
+    let mut bal_paths = vec![];
+    bal_paths.push("$.[*].asset");
+    bal_paths.push("$.[*].free");
+    bal_paths.push("$.[*].locked");
+
+    pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
+    let mut uids = vec![];
+    for request in requests {
+        // check url
+        if !request.url.starts_with(FUNDING_BALANCE_URL) {
+            return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
+        }
+
+        {
+            // balance
+            let json_value = messages[i]
+                .get_json_values(&bal_paths)
+                .map_err(|e| zkerr!(ZkErrorCode::GetJsonValueFail, e.to_string()))?;
+
+            ensure_zk!(
+                json_value.len() % bal_paths.len() == 0,
+                zkerr!(ZkErrorCode::InvalidJsonValueSize)
+            );
+
+            let mut _uid = vec![];
+            let size = json_value.len() / bal_paths.len();
+            for j in 0..size {
+                let asset = json_value[j].trim_matches('"').to_ascii_uppercase();
+                let free: f64 = json_value[size + j].trim_matches('"').parse().unwrap_or(0.0);
+                let locked: f64 = json_value[size * 2 + j].trim_matches('"').parse().unwrap_or(0.0);
+                *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked;
+
+                // for uid check
+                let v = format!("{}:{}:{}", asset, free, locked);
+                _uid.push(v);
+            }
+            _uid.sort();
+            let _uid = _uid.join(",");
+            if !_uid.is_empty() {
+                uids.push(_uid);
+            }
+        }
+
+        i += 1;
+    }
+
+    // Is the account duplicate?
+    let mut seen = HashSet::new();
+    ensure_zk!(
+        !uids.iter().any(|x| !seen.insert(x)),
+        zkerr!(ZkErrorCode::DuplicateAccount)
+    );
+
+    Ok(())
+}
+
 fn app_aster_spot(
     pv: &mut AttestationMetaStruct,
     attestation_data: &String,
@@ -702,6 +787,12 @@ fn app_binance(
         let mut margin_am = AttestationMetaStruct::default();
         app_binance_margin(&mut margin_am, &margin_data, attestation_config, &mut asset_bals)?;
         pv.attestation_meta.push(margin_am);
+    }
+
+    if let Some(funding_data) = attestations.get("binanceFunding") {
+        let mut funding_am = AttestationMetaStruct::default();
+        app_binance_funding(&mut funding_am, &funding_data, attestation_config, &mut asset_bals)?;
+        pv.attestation_meta.push(funding_am);
     }
 
     // Summary assets by Category

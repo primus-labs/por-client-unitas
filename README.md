@@ -26,6 +26,9 @@ The system currently supports the following exchanges and account categories:
 * **Margin Account**
   `https://api.binance.com/sapi/v1/margin/isolated/account`
   [API DOC](https://developers.binance.com/docs/margin_trading/account/Query-Isolated-Margin-Account-Info)
+* **Funding Wallet**
+  `https://api.binance.com/sapi/v1/asset/get-funding-asset`
+  [API DOC](https://developers.binance.com/docs/wallet/asset/funding-wallet)
 
 ### Aster
 
@@ -39,5 +42,5 @@ The system currently supports the following exchanges and account categories:
 ### Bybit
 
 * **Wallet Balance (UNIFIED)**
-  https://api.bybit.com/v5/account/wallet-balance
+  `https://api.bybit.com/v5/account/wallet-balance`
   [API DOC](https://bybit-exchange.github.io/docs/v5/account/wallet-balance)
