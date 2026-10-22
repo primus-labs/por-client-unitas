@@ -50,7 +50,6 @@ fn app_binance_spot(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut uid_paths = vec![];
     uid_paths.push("$.uid");
 
@@ -61,7 +60,7 @@ fn app_binance_spot(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(SPOT_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -98,8 +97,6 @@ fn app_binance_spot(
                 *asset_bals.entry(asset.to_string()).or_insert(0.0) += free + locked;
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -139,7 +136,6 @@ fn app_binance_future(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut uid_paths = vec![];
     uid_paths.push("$.[*].accountAlias");
 
@@ -150,7 +146,7 @@ fn app_binance_future(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(FEATURE_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -164,8 +160,6 @@ fn app_binance_future(
             if json_value.len() == 0 {
                 continue; // no any data of future response
             }
-
-            ensure_zk!(json_value.len() > 0, zkerr!(ZkErrorCode::InvalidJsonValueSize));
 
             let uid = json_value[0].trim_matches('"').to_string();
             uids.push(uid);
@@ -190,8 +184,6 @@ fn app_binance_future(
                 *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + un_pnl;
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -231,7 +223,6 @@ fn app_binance_unified(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut bal_paths = vec![];
 
     bal_paths.push("$.[*].asset");
@@ -242,7 +233,7 @@ fn app_binance_unified(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(UNIFIED_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -277,8 +268,6 @@ fn app_binance_unified(
                 uids.push(_uid);
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -318,7 +307,6 @@ fn app_binance_margin(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut bal_paths = vec![];
 
     bal_paths.push("$.assets[*].baseAsset.asset");
@@ -332,7 +320,7 @@ fn app_binance_margin(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(MARGIN_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -386,8 +374,6 @@ fn app_binance_margin(
                 }
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -427,7 +413,6 @@ fn app_binance_funding(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut bal_paths = vec![];
     bal_paths.push("$.[*].asset");
     bal_paths.push("$.[*].free");
@@ -435,7 +420,7 @@ fn app_binance_funding(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(FUNDING_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -470,8 +455,6 @@ fn app_binance_funding(
                 uids.push(_uid);
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -510,7 +493,6 @@ fn app_aster_spot(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut uid_paths = vec![];
     uid_paths.push("$.updateTime");
 
@@ -521,7 +503,7 @@ fn app_aster_spot(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(ASTER_SPOT_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -569,8 +551,6 @@ fn app_aster_spot(
                 uids.push(_uid);
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -610,7 +590,6 @@ fn app_aster_future(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut uid_paths = vec![];
     uid_paths.push("$.[*].accountAlias");
 
@@ -621,7 +600,7 @@ fn app_aster_future(
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(ASTER_FEATURE_BALANCE_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -635,8 +614,6 @@ fn app_aster_future(
             if json_value.len() == 0 {
                 continue; // no any data of future response
             }
-
-            ensure_zk!(json_value.len() > 0, zkerr!(ZkErrorCode::InvalidJsonValueSize));
 
             let uid = json_value[0].trim_matches('"').to_string();
             uids.push(uid);
@@ -661,8 +638,6 @@ fn app_aster_future(
                 *asset_bals.entry(asset.to_string()).or_insert(0.0) += bal + un_pnl;
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
@@ -702,14 +677,13 @@ fn app_bybit_unified(
     let requests_len = requests.len();
     ensure_zk!(requests_len == msg_len, zkerr!(ZkErrorCode::InvalidMessagesLength));
 
-    let mut i = 0;
     let mut bal_paths = vec![];
     bal_paths.push("$.result.list[*].coin[*].coin");
     bal_paths.push("$.result.list[*].coin[*].equity");
 
     pv.timestamp = attestation_data.public_data[0].attestation.timestamp as u128;
     let mut uids = vec![];
-    for request in requests {
+    for (i, request) in requests.iter().enumerate() {
         // check url
         if !request.url.starts_with(BYBIT_UNIFIED_ACCOUNT_URL) {
             return Err(zkerr!(ZkErrorCode::InvalidRequestUrl));
@@ -743,8 +717,6 @@ fn app_bybit_unified(
                 uids.push(_uid);
             }
         }
-
-        i += 1;
     }
 
     // Is the account duplicate?
